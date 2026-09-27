@@ -265,79 +265,66 @@
     </div>
 
     <script>
-        // Asset file structure organized by folders
-        const assetStructure = {
-            audio: [
-                'bgm_main.mp3',
-                'sfx_jump.wav',
-                'sfx_coin.wav',
-                'sfx_explosion.wav',
-                'voice_intro.ogg',
-            ],
-            models: [
-                'player_character.gltf',
-                'player_character.bin',
-                'enemy_basic.gltf',
-                'enemy_basic.bin',
-                'prop_tree.fbx',
-                'prop_rock.fbx',
-                'environment.gltf',
-            ],
-            textures: [
-                'player_diffuse.png',
-                'player_normal.png',
-                'enemy_diffuse.png',
-                'grass_diffuse.jpg',
-                'grass_normal.jpg',
-                'stone_diffuse.jpg',
-                'sky_cubemap.dds',
-                'ui_atlas.png',
-            ],
-            wasm: [
-                'physics_engine.wasm',
-                'pathfinding.wasm',
-                'audio_processing.wasm',
-            ],
-            animations: [
-                'player_idle.anim',
-                'player_run.anim',
-                'player_jump.anim',
-                'enemy_walk.anim',
-                'enemy_attack.anim',
-            ],
-            shaders: [
-                'standard.vert',
-                'standard.frag',
-                'water.vert',
-                'water.frag',
-                'particle.vert',
-                'particle.frag',
-            ],
-        };
-
         let allFiles = [];
         let filteredFiles = [];
 
         // Initialize
-        function init() {
-            prepareFilesList();
+        async function init() {
+            await scanDirectory();
             renderDashboard(filteredFiles);
             attachEventListeners();
         }
 
-        // Prepare files list from structure
-        function prepareFilesList() {
-            allFiles = [];
-            for (const [folder, files] of Object.entries(assetStructure)) {
-                files.forEach(fileName => {
-                    allFiles.push({
-                        folder,
-                        fileName,
-                        fullPath: `/${folder}/${fileName}`,
-                    });
-                });
+        // Scan directory structure by fetching from public folder
+        async function scanDirectory() {
+            try {
+                // Get the list of top-level directories
+                const response = await fetch('/', { method: 'HEAD' });
+                
+                // Try to scan common asset directories
+                const directories = ['audio', 'models', 'textures', 'wasm', 'animations', 'shaders'];
+                
+                for (const dir of directories) {
+                    await scanFolder(dir);
+                }
+                
+                filteredFiles = [...allFiles];
+                
+                if (allFiles.length === 0) {
+                    console.warn('No files found. Add folders like /audio, /models, /textures, etc.');
+                }
+            } catch (error) {
+                console.error('Error scanning directory:', error);
+                filteredFiles = [...allFiles];
             }
-            filteredFiles = [...allFiles];
+        }
+
+        // Attempt to scan a specific folder
+        async function scanFolder(folderName) {
+            try {
+                const folderUrl = `/${folderName}/`;
+                const response = await fetch(folderUrl);
+                
+                if (response.ok) {
+                    // If the server provides a directory listing, parse it
+                    const html = await response.text();
+                    const fileRegex = /href="([^"]+)"/g;
+                    let match;
+                    
+                    while ((match = fileRegex.exec(html)) !== null) {
+                        const fileName = match[1].replace(/\/$/, '');
+                        if (fileName && !fileName.startsWith('?') && fileName !== '../') {
+                            allFiles.push({
+                                folder: folderName,
+                                fileName: fileName,
+                                fullPath: `/${folderName}/${fileName}`,
+                            });
+                        }
+                    }
+                }
+            } catch (error) {
+                // Folder doesn't exist or no listing available
+            }
         }
 
         // Get base URL for asset links
@@ -379,7 +366,7 @@
                 dashboard.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📁</div>
-                        <div class="empty-state-text">No files match your search</div>
+                        <div class="empty-state-text">No files found. Add folders and files to get started.</div>
                     </div>
                 `;
                 updateStats(0, 0);
