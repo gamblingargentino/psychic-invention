@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Asset Server - File Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ecf0f1;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: #bdc3c7;
+            font-size: 1rem;
+        }
+
+        .search-container {
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            color: #ecf0f1;
+            transition: all 0.3s ease;
+        }
+
+        .search-input::placeholder {
+            color: #95a5a6;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .file-dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .folder-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .folder-section:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 212, 255, 0.4);
+        }
+
+        .folder-header {
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 255, 0.1));
+            padding: 15px 20px;
+            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .folder-icon {
+            font-size: 1.5rem;
+            color: #00d4ff;
+        }
+
+        .folder-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #00d4ff;
+            flex-grow: 1;
+        }
+
+        .file-count {
+            background: rgba(0, 212, 255, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #00d4ff;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .file-item {
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            transition: all 0.2s ease;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .file-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #ecf0f1;
+            margin-bottom: 5px;
+            word-break: break-word;
+        }
+
+        .file-path {
+            font-size: 0.85rem;
+            color: #95a5a6;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .copy-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #00d4ff, #0099ff);
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
+        }
+
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+
+        .copy-btn.copied {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #95a5a6;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.1rem;
+        }
+
+        .stats-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(0, 212, 255, 0.2);
+            color: #95a5a6;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .file-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .file-actions {
+                width: 100%;
+            }
+
+            .copy-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎮 Game Asset Server</h1>
+            <p>Static file dashboard and direct access to game resources</p>
+        </div>
+
+        <div class="search-container">
+            <input 
+                type="text" 
+                id="searchInput" 
+                class="search-input" 
+                placeholder="🔍 Search files by name..."
+            >
+        </div>
+
+        <div id="dashboard" class="file-dashboard"></div>
+
+        <div class="stats-footer">
+            <span id="statsText">Loading assets...</span>
+        </div>
+    </div>
+
+    <script>
+        // Asset file structure organized by folders
+        const assetStructure = {
+            audio: [
+                'bgm_main.mp3',
+                'sfx_jump.wav',
+                'sfx_coin.wav',
+                'sfx_explosion.wav',
+                'voice_intro.ogg',
+            ],
+            models: [
+                'player_character.gltf',
+                'player_character.bin',
+                'enemy_basic.gltf',
+                'enemy_basic.bin',
+                'prop_tree.fbx',
+                'prop_rock.fbx',
+                'environment.gltf',
+            ],
+            textures: [
+                'player_diffuse.png',
+                'player_normal.png',
+                'enemy_diffuse.png',
+                'grass_diffuse.jpg',
+                'grass_normal.jpg',
+                'stone_diffuse.jpg',
+                'sky_cubemap.dds',
+                'ui_atlas.png',
+            ],
+            wasm: [
+                'physics_engine.wasm',
+                'pathfinding.wasm',
+                'audio_processing.wasm',
+            ],
+            animations: [
+                'player_idle.anim',
+                'player_run.anim',
+                'player_jump.anim',
+                'enemy_walk.anim',
+                'enemy_attack.anim',
+            ],
+            shaders: [
+                'standard.vert',
+                'standard.frag',
+                'water.vert',
+                'water.frag',
+                'particle.vert',
+                'particle.frag',
+            ],
+        };
+
+        let allFiles = [];
+        let filteredFiles = [];
+
+        // Initialize
+        function init() {
+            prepareFilesList();
+            renderDashboard(filteredFiles);
+            attachEventListeners();
+        }
+
+        // Prepare files list from structure
+        function prepareFilesList() {
+            allFiles = [];
+            for (const [folder, files] of Object.entries(assetStructure)) {
+                files.forEach(fileName => {
+                    allFiles.push({
+                        folder,
+                        fileName,
+                        fullPath: `/${folder}/${fileName}`,
+                    });
+                });
+            }
+            filteredFiles = [...allFiles];
+        }
+
+        // Get base URL for asset links
+        function getBaseUrl() {
+            return window.location.origin;
+        }
+
+        // Filter files based on search
+        function filterFiles(searchTerm) {
+            const term = searchTerm.toLowerCase().trim();
+            if (!term) {
+                filteredFiles = [...allFiles];
+            } else {
+                filteredFiles = allFiles.filter(file =>
+                    file.fileName.toLowerCase().includes(term)
+                );
+            }
+            renderDashboard(filteredFiles);
+        }
+
+        // Group files by folder
+        function groupByFolder(files) {
+            const grouped = {};
+            files.forEach(file => {
+                if (!grouped[file.folder]) {
+                    grouped[file.folder] = [];
+                }
+                grouped[file.folder].push(file);
+            });
+            return grouped;
+        }
+
+        // Render dashboard
+        function renderDashboard(files) {
+            const dashboard = document.getElementById('dashboard');
+            const grouped = groupByFolder(files);
+
+            if (Object.keys(grouped).length === 0) {
+                dashboard.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📁</div>
+                        <div class="empty-state-text">No files match your search</div>
+                    </div>
+                `;
+                updateStats(0, 0);
+                return;
+            }
+
+            dashboard.innerHTML = Object.entries(grouped)
+                .map(([folder, filesInFolder]) => createFolderSection(folder, filesInFolder))
+                .join('');
+
+            attachCopyButtonListeners();
+            updateStats(files.length, Object.keys(grouped).length);
+        }
+
+        // Create folder section HTML
+        function createFolderSection(folder, files) {
+            const folderIcons = {
+                audio: '🔊',
+                models: '📦',
+                textures: '🎨',
+                wasm: '⚙️',
+                animations: '🎬',
+                shaders: '✨',
+            };
+
+            const icon = folderIcons[folder] || '📂';
+
+            const filesHTML = files
+                .map(file => createFileItem(file))
+                .join('');
+
+            return `
+                <div class="folder-section">
+                    <div class="folder-header">
+                        <span class="folder-icon">${icon}</span>
+                        <span class="folder-name">/${folder}</span>
+                        <span class="file-count">${files.length}</span>
+                    </div>
+                    <div class="file-list">
+                        ${filesHTML}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create file item HTML
+        function createFileItem(file) {
+            const fullUrl = `${getBaseUrl()}${file.fullPath}`;
+            return `
+                <div class="file-item">
+                    <div class="file-info">
+                        <div class="file-name">${file.fileName}</div>
+                        <div class="file-path">${file.fullPath}</div>
+                    </div>
+                    <div class="file-actions">
+                        <button class="copy-btn" data-url="${fullUrl}">
+                            Copy Link
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Attach copy button listeners
+        function attachCopyButtonListeners() {
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', async function () {
+                    const url = this.getAttribute('data-url');
+                    try {
+                        await navigator.clipboard.writeText(url);
+                        const originalText = this.textContent;
+                        this.textContent = '✓ Copied!';
+                        this.classList.add('copied');
+
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.classList.remove('copied');
+                        }, 2000);
+                    } catch (err) {
+                        console.error('Failed to copy:', err);
+                        this.textContent = 'Copy failed';
+                        setTimeout(() => {
+                            this.textContent = 'Copy Link';
+                        }, 2000);
+                    }
+                });
+            });
+        }
+
+        // Update statistics
+        function updateStats(fileCount, folderCount) {
+            const statsText = document.getElementById('statsText');
+            if (fileCount === 0) {
+                statsText.textContent = 'No files to display';
+            } else {
+                statsText.textContent = `${fileCount} file${fileCount !== 1 ? 's' : ''} across ${folderCount} folder${folderCount !== 1 ? 's' : ''}`;
+            }
+        }
+
+        // Attach event listeners
+        function attachEventListeners() {
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function () {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    filterFiles(this.value);
+                }, 150);
+            });
+        }
+
+        // Start the app
+        init();
+    </script>
+</body>
+</html>
