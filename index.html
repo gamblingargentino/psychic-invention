@@ -5,240 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Asset Server - File Dashboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #ecf0f1;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #00d4ff, #0099ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header p {
-            color: #bdc3c7;
-            font-size: 1rem;
-        }
-
-        .search-container {
-            margin-bottom: 30px;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 15px 20px;
-            font-size: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(0, 212, 255, 0.3);
-            border-radius: 8px;
-            color: #ecf0f1;
-            transition: all 0.3s ease;
-        }
-
-        .search-input::placeholder {
-            color: #95a5a6;
-        }
-
-        .search-input:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(0, 212, 255, 0.8);
-            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-        }
-
-        .file-dashboard {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-
-        .folder-section {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 10px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .folder-section:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(0, 212, 255, 0.4);
-        }
-
-        .folder-header {
-            background: linear-gradient(90deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 255, 0.1));
-            padding: 15px 20px;
-            border-bottom: 2px solid rgba(0, 212, 255, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .folder-icon {
-            font-size: 1.5rem;
-            color: #00d4ff;
-        }
-
-        .folder-name {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #00d4ff;
-            flex-grow: 1;
-        }
-
-        .file-count {
-            background: rgba(0, 212, 255, 0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            color: #00d4ff;
-        }
-
-        .file-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .file-item {
-            padding: 15px 20px;
-            background: rgba(255, 255, 255, 0.02);
-            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-            transition: all 0.2s ease;
-        }
-
-        .file-item:last-child {
-            border-bottom: none;
-        }
-
-        .file-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .file-info {
-            flex-grow: 1;
-            min-width: 0;
-        }
-
-        .file-name {
-            font-weight: 500;
-            color: #ecf0f1;
-            margin-bottom: 5px;
-            word-break: break-word;
-        }
-
-        .file-path {
-            font-size: 0.85rem;
-            color: #95a5a6;
-            font-family: 'Courier New', monospace;
-            word-break: break-all;
-        }
-
-        .file-actions {
-            display: flex;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .copy-btn {
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #00d4ff, #0099ff);
-            border: none;
-            border-radius: 6px;
-            color: #fff;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .copy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
-        }
-
-        .copy-btn:active {
-            transform: translateY(0);
-        }
-
-        .copy-btn.copied {
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #95a5a6;
-        }
-
-        .empty-state-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .empty-state-text {
-            font-size: 1.1rem;
-        }
-
-        .stats-footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 212, 255, 0.2);
-            color: #95a5a6;
-            font-size: 0.9rem;
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8rem;
-            }
-
-            .file-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .file-actions {
-                width: 100%;
-            }
-
-            .copy-btn {
-                width: 100%;
-                justify-content: center;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #ecf0f1; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; background: linear-gradient(135deg, #00d4ff, #0099ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header p { color: #bdc3c7; font-size: 1rem; }
+        .search-container { margin-bottom: 30px; }
+        .search-input { width: 100%; padding: 15px 20px; font-size: 1rem; background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(0, 212, 255, 0.3); border-radius: 8px; color: #ecf0f1; transition: all 0.3s ease; }
+        .search-input::placeholder { color: #95a5a6; }
+        .search-input:focus { outline: none; background: rgba(255, 255, 255, 0.15); border-color: rgba(0, 212, 255, 0.8); box-shadow: 0 0 15px rgba(0, 212, 255, 0.3); }
+        .file-dashboard { display: flex; flex-direction: column; gap: 30px; }
+        .folder-section { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 10px; overflow: hidden; transition: all 0.3s ease; }
+        .folder-section:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(0, 212, 255, 0.4); }
+        .folder-header { background: linear-gradient(90deg, rgba(0, 212, 255, 0.2), rgba(0, 153, 255, 0.1)); padding: 15px 20px; border-bottom: 2px solid rgba(0, 212, 255, 0.3); display: flex; align-items: center; gap: 10px; }
+        .folder-icon { font-size: 1.5rem; color: #00d4ff; }
+        .folder-name { font-size: 1.2rem; font-weight: 600; color: #00d4ff; flex-grow: 1; text-transform: capitalize; }
+        .file-count { background: rgba(0, 212, 255, 0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; color: #00d4ff; }
+        .file-list { display: flex; flex-direction: column; gap: 1px; background: rgba(0, 0, 0, 0.2); }
+        .file-item { padding: 15px 20px; background: rgba(255, 255, 255, 0.02); border-bottom: 1px solid rgba(0, 212, 255, 0.1); display: flex; align-items: center; justify-content: space-between; gap: 15px; transition: all 0.2s ease; }
+        .file-item:last-child { border-bottom: none; }
+        .file-item:hover { background: rgba(255, 255, 255, 0.06); }
+        .file-info { flex-grow: 1; min-width: 0; }
+        .file-name { font-weight: 500; color: #ecf0f1; margin-bottom: 5px; word-break: break-word; }
+        .file-path { font-size: 0.85rem; color: #95a5a6; font-family: 'Courier New', monospace; word-break: break-all; }
+        .file-actions { display: flex; gap: 8px; flex-shrink: 0; }
+        .copy-btn { padding: 8px 16px; background: linear-gradient(135deg, #00d4ff, #0099ff); border: none; border-radius: 6px; color: #fff; font-weight: 600; cursor: pointer; font-size: 0.9rem; transition: all 0.3s ease; white-space: nowrap; }
+        .copy-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4); }
+        .copy-btn:active { transform: translateY(0); }
+        .copy-btn.copied { background: linear-gradient(135deg, #27ae60, #2ecc71); box-shadow: 0 0 10px rgba(46, 204, 113, 0.5); }
+        .empty-state { text-align: center; padding: 60px 20px; color: #95a5a6; }
+        .empty-state-icon { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+        .empty-state-text { font-size: 1.1rem; }
+        .stats-footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(0, 212, 255, 0.2); color: #95a5a6; font-size: 0.9rem; }
+        @media (max-width: 768px) { .header h1 { font-size: 1.8rem; } .file-item { flex-direction: column; align-items: flex-start; } .file-actions { width: 100%; } .copy-btn { width: 100%; justify-content: center; } }
     </style>
 </head>
 <body>
@@ -249,16 +49,10 @@
         </div>
 
         <div class="search-container">
-            <input 
-                type="text" 
-                id="searchInput" 
-                class="search-input" 
-                placeholder="🔍 Search files by name..."
-            >
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search files by name...">
         </div>
 
         <div id="dashboard" class="file-dashboard"></div>
-
         <div class="stats-footer">
             <span id="statsText">Loading assets...</span>
         </div>
@@ -268,71 +62,93 @@
         let allFiles = [];
         let filteredFiles = [];
 
-        // Initialize
         async function init() {
             await scanDirectory();
             renderDashboard(filteredFiles);
             attachEventListeners();
         }
 
-        // Scan directory structure by fetching from public folder
+        // DYNAMICALLY SCAN FOR ALL DIRECTORIES
         async function scanDirectory() {
             try {
-                // Get the list of top-level directories
-                const response = await fetch('/', { method: 'HEAD' });
+                // Fetch the root directory listing from Vercel
+                const response = await fetch('/');
+                if (!response.ok) return;
+
+                const html = await response.text();
                 
-                // Try to scan common asset directories
-                const directories = ['audio', 'models', 'textures', 'wasm', 'animations', 'shaders'];
+                // Parse the Vercel HTML directory output
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const links = Array.from(doc.querySelectorAll('a'));
                 
+                const directories = [];
+                
+                for (const link of links) {
+                    const href = link.getAttribute('href');
+                    if (!href || href === '/' || href.startsWith('?') || href.includes('..')) continue;
+                    
+                    let cleanName = href.replace(/^\/|\/$/g, '');
+                    
+                    // If it doesn't have a file extension, we treat it as a dynamically found folder
+                    if (cleanName && !cleanName.includes('.') && !cleanName.startsWith('.')) {
+                        if (!directories.includes(cleanName)) {
+                            directories.push(cleanName);
+                        }
+                    }
+                }
+
+                // Scan all discovered folders automatically
                 for (const dir of directories) {
                     await scanFolder(dir);
                 }
                 
                 filteredFiles = [...allFiles];
                 
-                if (allFiles.length === 0) {
-                    console.warn('No files found. Add folders like /audio, /models, /textures, etc.');
-                }
             } catch (error) {
-                console.error('Error scanning directory:', error);
+                console.error('Error scanning root:', error);
                 filteredFiles = [...allFiles];
             }
         }
 
-        // Attempt to scan a specific folder
+        // DYNAMICALLY SCAN FILES INSIDE FOLDERS
         async function scanFolder(folderName) {
             try {
                 const folderUrl = `/${folderName}/`;
                 const response = await fetch(folderUrl);
                 
                 if (response.ok) {
-                    // If the server provides a directory listing, parse it
                     const html = await response.text();
-                    const fileRegex = /href="([^"]+)"/g;
-                    let match;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const links = Array.from(doc.querySelectorAll('a'));
                     
-                    while ((match = fileRegex.exec(html)) !== null) {
-                        const fileName = match[1].replace(/\/$/, '');
-                        if (fileName && !fileName.startsWith('?') && fileName !== '../') {
+                    for (const link of links) {
+                        const href = link.getAttribute('href');
+                        if (!href || href.startsWith('?') || href.includes('..')) continue;
+                        
+                        let fileName = href.replace(/^\/|\/$/g, '');
+                        
+                        // If it has a file extension, it's an asset file
+                        if (fileName && fileName.includes('.')) {
+                            const fullPath = href.startsWith('/') ? href : `/${folderName}/${fileName}`;
                             allFiles.push({
                                 folder: folderName,
                                 fileName: fileName,
-                                fullPath: `/${folderName}/${fileName}`,
+                                fullPath: fullPath,
                             });
                         }
                     }
                 }
             } catch (error) {
-                // Folder doesn't exist or no listing available
+                console.error(`Could not scan folder: ${folderName}`, error);
             }
         }
 
-        // Get base URL for asset links
         function getBaseUrl() {
             return window.location.origin;
         }
 
-        // Filter files based on search
         function filterFiles(searchTerm) {
             const term = searchTerm.toLowerCase().trim();
             if (!term) {
@@ -345,19 +161,15 @@
             renderDashboard(filteredFiles);
         }
 
-        // Group files by folder
         function groupByFolder(files) {
             const grouped = {};
             files.forEach(file => {
-                if (!grouped[file.folder]) {
-                    grouped[file.folder] = [];
-                }
+                if (!grouped[file.folder]) grouped[file.folder] = [];
                 grouped[file.folder].push(file);
             });
             return grouped;
         }
 
-        // Render dashboard
         function renderDashboard(files) {
             const dashboard = document.getElementById('dashboard');
             const grouped = groupByFolder(files);
@@ -366,7 +178,7 @@
                 dashboard.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-state-icon">📁</div>
-                        <div class="empty-state-text">No files found. Add folders and files to get started.</div>
+                        <div class="empty-state-text">No files found. Ensure directoryListing is true in vercel.json.</div>
                     </div>
                 `;
                 updateStats(0, 0);
@@ -381,22 +193,10 @@
             updateStats(files.length, Object.keys(grouped).length);
         }
 
-        // Create folder section HTML
         function createFolderSection(folder, files) {
-            const folderIcons = {
-                audio: '🔊',
-                models: '📦',
-                textures: '🎨',
-                wasm: '⚙️',
-                animations: '🎬',
-                shaders: '✨',
-            };
-
-            const icon = folderIcons[folder] || '📂';
-
-            const filesHTML = files
-                .map(file => createFileItem(file))
-                .join('');
+            const iconMap = { audio: '🔊', models: '📦', textures: '🎨', wasm: '⚙️', shaders: '✨' };
+            const icon = iconMap[folder.toLowerCase()] || '📂';
+            const filesHTML = files.map(file => createFileItem(file)).join('');
 
             return `
                 <div class="folder-section">
@@ -412,7 +212,6 @@
             `;
         }
 
-        // Create file item HTML
         function createFileItem(file) {
             const fullUrl = `${getBaseUrl()}${file.fullPath}`;
             return `
@@ -422,15 +221,12 @@
                         <div class="file-path">${file.fullPath}</div>
                     </div>
                     <div class="file-actions">
-                        <button class="copy-btn" data-url="${fullUrl}">
-                            Copy Link
-                        </button>
+                        <button class="copy-btn" data-url="${fullUrl}">Copy Link</button>
                     </div>
                 </div>
             `;
         }
 
-        // Attach copy button listeners
         function attachCopyButtonListeners() {
             document.querySelectorAll('.copy-btn').forEach(btn => {
                 btn.addEventListener('click', async function () {
@@ -440,7 +236,6 @@
                         const originalText = this.textContent;
                         this.textContent = '✓ Copied!';
                         this.classList.add('copied');
-
                         setTimeout(() => {
                             this.textContent = originalText;
                             this.classList.remove('copied');
@@ -448,15 +243,12 @@
                     } catch (err) {
                         console.error('Failed to copy:', err);
                         this.textContent = 'Copy failed';
-                        setTimeout(() => {
-                            this.textContent = 'Copy Link';
-                        }, 2000);
+                        setTimeout(() => { this.textContent = 'Copy Link'; }, 2000);
                     }
                 });
             });
         }
 
-        // Update statistics
         function updateStats(fileCount, folderCount) {
             const statsText = document.getElementById('statsText');
             if (fileCount === 0) {
@@ -466,20 +258,15 @@
             }
         }
 
-        // Attach event listeners
         function attachEventListeners() {
             const searchInput = document.getElementById('searchInput');
             let searchTimeout;
-
             searchInput.addEventListener('input', function () {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    filterFiles(this.value);
-                }, 150);
+                searchTimeout = setTimeout(() => { filterFiles(this.value); }, 150);
             });
         }
 
-        // Start the app
         init();
     </script>
 </body>
